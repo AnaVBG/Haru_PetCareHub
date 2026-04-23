@@ -1,4 +1,4 @@
-package com.dama2.app.dto;
+package com.dam2.app.dto;
 
 public record PinInsertarDTO(
 		String tipo,

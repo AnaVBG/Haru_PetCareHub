@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dam2.app.dto.MascotaDTO;
+import com.dam2.app.dto.MascotaInsertarDTO;
 import com.dam2.app.model.Mascota;
 import com.dam2.app.service.MascotaService;
-import com.dama2.app.dto.MascotaDTO;
-import com.dama2.app.dto.MascotaInsertarDTO;
 
 @RestController
 @RequestMapping("/api/mascotas")

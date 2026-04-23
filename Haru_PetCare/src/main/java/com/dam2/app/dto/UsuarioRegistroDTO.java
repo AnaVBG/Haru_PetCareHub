@@ -1,4 +1,4 @@
-package com.dama2.app.dto;
+package com.dam2.app.dto;
 
 /**
  * Datos que un nuevo usuario envía al registrarse.

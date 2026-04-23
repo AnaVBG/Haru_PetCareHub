@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dam2.app.dto.MascotaDTO;
+import com.dam2.app.dto.MascotaInsertarDTO;
 import com.dam2.app.model.Mascota;
 import com.dam2.app.model.Usuario;
 import com.dam2.app.repo.MascotaRepository;
 import com.dam2.app.repo.UsuarioRepository;
-import com.dama2.app.dto.MascotaDTO;
-import com.dama2.app.dto.MascotaInsertarDTO;
 
 
 @Service

@@ -1,4 +1,4 @@
-package com.dama2.app.dto;
+package com.dam2.app.dto;
 
 /**
  * Lo que devuelve el servidor tras un login exitoso.

@@ -1,4 +1,4 @@
-package com.dama2.app.dto;
+package com.dam2.app.dto;
 
 /**
  * Lo que envía el botón de emergencia desde Android.
