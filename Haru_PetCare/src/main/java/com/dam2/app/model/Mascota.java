@@ -47,8 +47,14 @@ public class Mascota {
 
     @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Cita> citas = new HashSet<>();
+    
+    @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<HistorialMedico> historial = new HashSet<>();
 
-    public Mascota() {
+    @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<AlertaPerdida> alertas = new HashSet<>();
+
+	public Mascota() {
         super();
     }
 
@@ -123,6 +129,21 @@ public class Mascota {
     public void setCitas(Set<Cita> citas) {
         this.citas = citas;
     }
+    public Set<HistorialMedico> getHistorial() {
+		return historial;
+	}
+
+	public void setHistorial(Set<HistorialMedico> historial) {
+		this.historial = historial;
+	}
+
+	public Set<AlertaPerdida> getAlertas() {
+		return alertas;
+	}
+
+	public void setAlertas(Set<AlertaPerdida> alertas) {
+		this.alertas = alertas;
+	}
 
     @Override
     public int hashCode() {

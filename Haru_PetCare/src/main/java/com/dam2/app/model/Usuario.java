@@ -56,6 +56,12 @@ public class Usuario {
 	@OneToMany(mappedBy = "dueno", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<Cita> citasComoUsuario = new HashSet<>();
 	
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<PinMapa> pines = new HashSet<>();
+
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<AlertaPerdida> alertas = new HashSet<>();
+	
 	
 	public Long getId() {
 		return id;
@@ -122,6 +128,18 @@ public class Usuario {
 	}
 	public void setCitasComoUsuario(Set<Cita> citasComoUsuario) {
 		this.citasComoUsuario = citasComoUsuario;
+	}
+	public Set<PinMapa> getPines() {
+		return pines;
+	}
+	public void setPines(Set<PinMapa> pines) {
+		this.pines = pines;
+	}
+	public Set<AlertaPerdida> getAlertas() {
+		return alertas;
+	}
+	public void setAlertas(Set<AlertaPerdida> alertas) {
+		this.alertas = alertas;
 	}
 	
 	@Override
