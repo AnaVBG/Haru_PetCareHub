@@ -5,24 +5,17 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-/**
- * Configuración central de Spring Security.
- *
- * Reglas:
- * - /api/auth/** → público (login y registro sin token)
- * - Todo lo demás → requiere JWT válido
- * - Sin estado (STATELESS): el servidor no guarda sesión, el token lo es todo
- */
 @Configuration
-@EnableMethodSecurity   // Habilita @PreAuthorize en los controladores
+@EnableMethodSecurity
 public class SecurityConfig {
 
-	private final JwtFilter jwtFilter;
+    private final JwtFilter jwtFilter;
 
     public SecurityConfig(JwtFilter jwtFilter) {
         this.jwtFilter = jwtFilter;
@@ -31,25 +24,29 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())    // API REST: no necesitamos CSRF
+            .csrf(csrf -> csrf.disable())
             .sessionManagement(sm -> sm
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()   // Login y registro: libres
-                .anyRequest().authenticated()                  // Todo lo demás: token obligatorio
+                .requestMatchers("/api/auth/**").permitAll()
+                .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    /**
-     * BCrypt para hashear contraseñas.
-     * Nunca se guarda la contraseña en texto plano en la base de datos.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-	
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            throw new RuntimeException(
+                "Autenticación gestionada por JWT — UserDetailsService no utilizado"
+            );
+        };
+    }
 }
