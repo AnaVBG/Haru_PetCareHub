@@ -13,6 +13,8 @@ public interface CitaRepository extends JpaRepository<Cita, Long>{
 	// Requisito: Agenda del veterinario (Citas pendientes de un veterinario)
     List<Cita> findByVeterinario_IdAndEstado(Long idVeterinario, EstadoCita estado);
     
+    List<Cita> findByDueno_Id(Long idDueno);
+    
     // Requisito: Próximas citas de una mascota específica
     @Query("""
             SELECT c FROM Cita c 
