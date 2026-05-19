@@ -16,7 +16,8 @@ public record AlertaPerdidaDTO(
 	    String nombreMascota,
 	    String fotoUrlMascota,   // Para mostrar la foto en la notificación push
 	    String nombreDueno,
-	    String telefonoDueno     // Para que los vecinos puedan llamar directamente
+	    String telefonoDueno,
+	    Long idUsuario // Para que los vecinos puedan llamar directamente
 		) {
 
 }

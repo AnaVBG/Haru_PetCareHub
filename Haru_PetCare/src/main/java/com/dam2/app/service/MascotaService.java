@@ -93,4 +93,12 @@ public class MascotaService {
                 m.getDueno().getId()
         );
     }
+    
+    @Transactional(readOnly = true)
+    public MascotaDTO obtenerPorId(Long id) {
+        Mascota m = mascotaRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+        return toDTO(m);
+    }
+    
 }

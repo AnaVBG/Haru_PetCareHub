@@ -121,6 +121,7 @@ public class AlertaPerdidaService {
 	private AlertaPerdidaDTO toDTO(AlertaPerdida a) {
 		return new AlertaPerdidaDTO(a.getId(), a.getUltimaUbicacionLat(), a.getUltimaUbicacionLng(),
 				a.getMensajeAdicional(), a.getActiva(), a.getFechaAlerta(), a.getMascota().getNombre(),
-				a.getMascota().getFotoUrl(), a.getUsuario().getNombre(), a.getUsuario().getTelefono());
+				a.getMascota().getFotoUrl(), a.getUsuario().getNombre(), a.getUsuario().getTelefono(),
+				a.getUsuario().getId());
 	}
 }

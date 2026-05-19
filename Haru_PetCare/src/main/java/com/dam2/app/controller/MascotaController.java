@@ -39,6 +39,11 @@ public class MascotaController {
     public ResponseEntity<List<MascotaDTO>> getMascotasPorDueno(@PathVariable Long id) {
         return ResponseEntity.ok(mascotaService.obtenerMascotasPorDueno(id));
     }
+    
+    @GetMapping("/{id}")
+    public ResponseEntity<MascotaDTO> getMascotaPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(mascotaService.obtenerPorId(id));
+    }
 
     /**
      * POST /api/mascotas/inserta
