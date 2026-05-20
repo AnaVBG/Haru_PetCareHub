@@ -1,20 +1,16 @@
 package com.dam2.app.service;
 
-import com.dam2.app.dto.MascotaDTO;
-import com.dam2.app.dto.MascotaInsertarDTO;
-import com.dam2.app.model.Mascota;
-import com.dam2.app.model.Usuario;
-import com.dam2.app.repo.MascotaRepository;
-import com.dam2.app.repo.UsuarioRepository;
+import com.dam2.app.dto.*;
+import com.dam2.app.model.*;
+import com.dam2.app.repo.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -22,24 +18,115 @@ public class MascotaService {
 
     private final MascotaRepository mascotaRepo;
     private final UsuarioRepository usuarioRepo;
+    private final PasswordEncoder   passwordEncoder;
 
-    public MascotaService(MascotaRepository mascotaRepo, UsuarioRepository usuarioRepo) {
-        this.mascotaRepo = mascotaRepo;
-        this.usuarioRepo = usuarioRepo;
+    public MascotaService(MascotaRepository mascotaRepo,
+                          UsuarioRepository usuarioRepo,
+                          PasswordEncoder passwordEncoder) {
+        this.mascotaRepo     = mascotaRepo;
+        this.usuarioRepo     = usuarioRepo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional(readOnly = true)
     public List<MascotaDTO> obtenerMascotasPorDueno(Long idDueno) {
         return mascotaRepo.findByDueno_Id(idDueno)
-                .stream()
-                .map(this::toDTO)
-                .toList();
+                .stream().map(this::toDTO).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MascotaDTO> buscarTodas(Long idUsuario, String especie, String buscar) {
+        Usuario usuario = usuarioRepo.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        List<Mascota> resultado;
+
+        if (RolUsuario.VETERINARIO.equals(usuario.getRol())
+                && usuario.getClinica() != null) {
+            resultado = mascotaRepo.buscarPorClinica(
+                    usuario.getClinica().getId(), especie, buscar);
+        } else if (RolUsuario.CLINICA.equals(usuario.getRol())) {
+            resultado = mascotaRepo.buscarPorClinica(
+                    usuario.getId(), especie, buscar);
+        } else {
+            resultado = mascotaRepo.buscarTodas(especie, buscar);
+        }
+
+        return resultado.stream().map(this::toDTO).toList();
+    }
+
+    /**
+     * Vincula una o todas las mascotas de un dueño a una clínica.
+     * Si dto.idMascota() es null se vinculan todas las mascotas del dueño.
+     */
+    @Transactional
+    public List<MascotaDTO> vincularAClinica(VincularMascotaClinicaDTO dto) {
+        Usuario clinica = usuarioRepo.findById(dto.idClinica())
+                .orElseThrow(() -> new RuntimeException("Clínica no encontrada"));
+
+        if (!RolUsuario.CLINICA.equals(clinica.getRol())) {
+            throw new RuntimeException("El usuario indicado no es una clínica");
+        }
+
+        List<Mascota> mascotas;
+
+        if (dto.idMascota() != null) {
+            // Vincular solo una mascota concreta
+            Mascota m = mascotaRepo.findById(dto.idMascota())
+                    .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+            m.setClinica(clinica);
+            mascotas = List.of(mascotaRepo.save(m));
+        } else {
+            // Vincular todas las mascotas del dueño
+            mascotas = mascotaRepo.findByDueno_Id(dto.idDueno());
+            if (mascotas.isEmpty()) {
+                throw new RuntimeException("El dueño no tiene mascotas registradas");
+            }
+            mascotas.forEach(m -> m.setClinica(clinica));
+            mascotas = mascotaRepo.saveAll(mascotas);
+        }
+
+        return mascotas.stream().map(this::toDTO).toList();
+    }
+
+    /**
+     * Crea un dueño nuevo con una mascota y los vincula a la clínica.
+     */
+    @Transactional
+    public MascotaDTO crearDuenoConMascota(CrearDuenoConMascotaDTO dto) {
+        if (usuarioRepo.findByEmail(dto.email()).isPresent()) {
+            throw new RuntimeException("El email ya está registrado");
+        }
+
+        Usuario clinica = usuarioRepo.findById(dto.idClinica())
+                .orElseThrow(() -> new RuntimeException("Clínica no encontrada"));
+
+        // Crear el dueño
+        Usuario dueno = new Usuario();
+        dueno.setNombre(dto.nombre());
+        dueno.setEmail(dto.email());
+        dueno.setPassword(passwordEncoder.encode(dto.password()));
+        dueno.setRol(RolUsuario.DUENO);
+        dueno.setTelefono(dto.telefono());
+        dueno.setFechaRegistro(LocalDateTime.now());
+        usuarioRepo.save(dueno);
+
+        // Crear la mascota vinculada al dueño y a la clínica
+        Mascota mascota = new Mascota();
+        mascota.setNombre(dto.nombreMascota());
+        mascota.setEspecie(dto.especie());
+        mascota.setRaza(dto.raza());
+        mascota.setFechaNacimiento(dto.fechaNacimiento());
+        mascota.setDueno(dueno);
+        mascota.setClinica(clinica);
+
+        return toDTO(mascotaRepo.save(mascota));
     }
 
     @Transactional
     public MascotaDTO guardarDesdeDTO(MascotaInsertarDTO dto) {
         Usuario dueno = usuarioRepo.findById(dto.duenoId())
-                .orElseThrow(() -> new RuntimeException("Dueño no encontrado con id: " + dto.duenoId()));
+                .orElseThrow(() -> new RuntimeException("Dueño no encontrado"));
 
         Mascota nuevaMascota = new Mascota();
         nuevaMascota.setNombre(dto.nombre());
@@ -55,24 +142,19 @@ public class MascotaService {
     public MascotaDTO subirFoto(Long id, MultipartFile foto) {
         Mascota mascota = mascotaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mascota no encontrada con id: " + id));
-
         try {
             Path uploadsDir = Paths.get(System.getProperty("user.home"), "haru_uploads");
-            if (!Files.exists(uploadsDir)) {
-                Files.createDirectories(uploadsDir);
-            }
+            if (!Files.exists(uploadsDir)) Files.createDirectories(uploadsDir);
 
-            String original = foto.getOriginalFilename();
+            String original  = foto.getOriginalFilename();
             String extension = (original != null && original.contains("."))
-                    ? original.substring(original.lastIndexOf('.'))
-                    : ".jpg";
+                    ? original.substring(original.lastIndexOf('.')) : ".jpg";
             String nombreFichero = "mascota_" + id + "_" + System.currentTimeMillis() + extension;
-            Path destino = uploadsDir.resolve(nombreFichero);
-            Files.copy(foto.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(foto.getInputStream(), uploadsDir.resolve(nombreFichero),
+                    StandardCopyOption.REPLACE_EXISTING);
 
             mascota.setFotoUrl("/uploads/" + nombreFichero);
             return toDTO(mascotaRepo.save(mascota));
-
         } catch (IOException e) {
             throw new RuntimeException("Error al guardar la foto: " + e.getMessage());
         }
@@ -80,9 +162,8 @@ public class MascotaService {
 
     @Transactional(readOnly = true)
     public MascotaDTO obtenerPorId(Long id) {
-        Mascota m = mascotaRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
-        return toDTO(m);
+        return toDTO(mascotaRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada")));
     }
 
     private MascotaDTO toDTO(Mascota m) {
@@ -93,7 +174,9 @@ public class MascotaService {
                 m.getRaza(),
                 m.getFechaNacimiento(),
                 m.getFotoUrl(),
-                m.getDueno().getId()
+                m.getDueno().getId(),
+                m.getDueno().getNombre(),
+                m.getClinica() != null ? m.getClinica().getId() : null
         );
     }
 }

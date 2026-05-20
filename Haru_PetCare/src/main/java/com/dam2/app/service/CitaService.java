@@ -1,4 +1,3 @@
-// service/CitaService.java — versión completa
 package com.dam2.app.service;
 
 import com.dam2.app.dto.CitaDTO;
@@ -13,9 +12,9 @@ import java.util.List;
 @Service
 public class CitaService {
 
-    private final CitaRepository     citaRepo;
-    private final MascotaRepository  mascotaRepo;
-    private final UsuarioRepository  usuarioRepo;
+    private final CitaRepository    citaRepo;
+    private final MascotaRepository mascotaRepo;
+    private final UsuarioRepository usuarioRepo;
 
     public CitaService(CitaRepository citaRepo,
                        MascotaRepository mascotaRepo,
@@ -28,26 +27,32 @@ public class CitaService {
     @Transactional(readOnly = true)
     public List<CitaDTO> obtenerAgendaVeterinario(Long idVeterinario) {
         return citaRepo.findByVeterinario_IdAndEstado(idVeterinario, EstadoCita.PENDIENTE)
-                .stream()
-                .map(this::toDTO)
-                .toList();
+                .stream().map(this::toDTO).toList();
     }
 
     @Transactional(readOnly = true)
     public List<CitaDTO> obtenerCitasDeDueno(Long idDueno) {
         return citaRepo.findByDueno_Id(idDueno)
-                .stream()
-                .map(this::toDTO)
-                .toList();
+                .stream().map(this::toDTO).toList();
+    }
+
+    /**
+     * Todas las citas (cualquier estado) de todos los veterinarios
+     * que pertenecen a la clínica indicada.
+     */
+    @Transactional(readOnly = true)
+    public List<CitaDTO> obtenerCitasDeClinica(Long idClinica) {
+        return citaRepo.findByVeterinario_Clinica_Id(idClinica)
+                .stream().map(this::toDTO).toList();
     }
 
     @Transactional
     public CitaDTO crearCita(CitaInsertarDTO dto) {
-        Mascota mascota     = mascotaRepo.findById(dto.idMascota())
+        Mascota mascota = mascotaRepo.findById(dto.idMascota())
                 .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
         Usuario veterinario = usuarioRepo.findById(dto.idVeterinario())
                 .orElseThrow(() -> new RuntimeException("Veterinario no encontrado"));
-        Usuario dueno       = usuarioRepo.findById(dto.idDueno())
+        Usuario dueno = usuarioRepo.findById(dto.idDueno())
                 .orElseThrow(() -> new RuntimeException("Dueño no encontrado"));
 
         Cita cita = new Cita();
@@ -69,7 +74,6 @@ public class CitaService {
         return toDTO(citaRepo.save(cita));
     }
 
-    // Método privado de mapeo para no repetir código (DRY)
     private CitaDTO toDTO(Cita c) {
         return new CitaDTO(
                 c.getId(),

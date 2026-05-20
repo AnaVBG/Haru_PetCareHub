@@ -19,7 +19,7 @@ public class CitaController {
     }
 
     @GetMapping("/veterinario/{id}")
-    @PreAuthorize("hasRole('VETERINARIO')")
+    @PreAuthorize("hasRole('VETERINARIO') or hasRole('CLINICA')")
     public ResponseEntity<List<CitaDTO>> agendaVeterinario(@PathVariable Long id) {
         return ResponseEntity.ok(citaService.obtenerAgendaVeterinario(id));
     }
@@ -29,14 +29,21 @@ public class CitaController {
         return ResponseEntity.ok(citaService.obtenerCitasDeDueno(id));
     }
 
+    /** Todas las citas de los veterinarios de una clínica */
+    @GetMapping("/clinica/{idClinica}")
+    @PreAuthorize("hasRole('CLINICA')")
+    public ResponseEntity<List<CitaDTO>> citasClinica(@PathVariable Long idClinica) {
+        return ResponseEntity.ok(citaService.obtenerCitasDeClinica(idClinica));
+    }
+
     @PostMapping
-    @PreAuthorize("hasRole('VETERINARIO')")
+    @PreAuthorize("hasRole('VETERINARIO') or hasRole('CLINICA')")
     public ResponseEntity<CitaDTO> crearCita(@RequestBody CitaInsertarDTO dto) {
         return ResponseEntity.ok(citaService.crearCita(dto));
     }
 
     @PutMapping("/{id}/estado")
-    @PreAuthorize("hasRole('VETERINARIO')")
+    @PreAuthorize("hasRole('VETERINARIO') or hasRole('CLINICA')")
     public ResponseEntity<CitaDTO> cambiarEstado(@PathVariable Long id,
                                                   @RequestBody String nuevoEstado) {
         return ResponseEntity.ok(citaService.cambiarEstado(id, nuevoEstado));

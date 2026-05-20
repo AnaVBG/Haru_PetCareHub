@@ -22,114 +22,126 @@ import jakarta.persistence.Table;
 public class Mascota {
 
 	@Id
-    @Column(name = "id", nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    
-    @Column(nullable = false, length = 50)
-    private String nombre;
-    
-    @Column(nullable = false, length = 50)
-    private String especie;
-    
-    @Column(length = 50)
-    private String raza;
-    
-    @Column(name = "fecha_nacimiento")
-    private LocalDate fechaNacimiento;
-    
-    @Column(name = "foto_url", length = 255)
-    private String fotoUrl;
-    
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "dueno_id", nullable = false)
-    private Usuario dueno;
+	@Column(name = "id", nullable = false)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Cita> citas = new HashSet<>();
-    
-    @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<HistorialMedico> historial = new HashSet<>();
+	@Column(nullable = false, length = 50)
+	private String nombre;
 
-    @OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<AlertaPerdida> alertas = new HashSet<>();
+	@Column(nullable = false, length = 50)
+	private String especie;
+
+	@Column(length = 50)
+	private String raza;
+
+	@Column(name = "fecha_nacimiento")
+	private LocalDate fechaNacimiento;
+
+	@Column(name = "foto_url", length = 255)
+	private String fotoUrl;
+
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "dueno_id", nullable = false)
+	private Usuario dueno;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "clinica_id")
+	private Usuario clinica;
+
+	@OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<Cita> citas = new HashSet<>();
+
+	@OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<HistorialMedico> historial = new HashSet<>();
+
+	@OneToMany(mappedBy = "mascota", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<AlertaPerdida> alertas = new HashSet<>();
 
 	public Mascota() {
-        super();
-    }
+		super();
+	}
 
-    public Mascota(Long id, String nombre, String especie, Usuario dueno) {
-        super();
-        this.id = id;
-        this.nombre = nombre;
-        this.especie = especie;
-        this.dueno = dueno;
-    }
+	public Mascota(Long id, String nombre, String especie, Usuario dueno) {
+		this.id = id;
+		this.nombre = nombre;
+		this.especie = especie;
+		this.dueno = dueno;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public String getNombre() {
-        return nombre;
-    }
+	public String getNombre() {
+		return nombre;
+	}
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
 
-    public String getEspecie() {
-        return especie;
-    }
+	public String getEspecie() {
+		return especie;
+	}
 
-    public void setEspecie(String especie) {
-        this.especie = especie;
-    }
+	public void setEspecie(String especie) {
+		this.especie = especie;
+	}
 
-    public String getRaza() {
-        return raza;
-    }
+	public String getRaza() {
+		return raza;
+	}
 
-    public void setRaza(String raza) {
-        this.raza = raza;
-    }
+	public void setRaza(String raza) {
+		this.raza = raza;
+	}
 
-    public LocalDate getFechaNacimiento() {
-        return fechaNacimiento;
-    }
+	public LocalDate getFechaNacimiento() {
+		return fechaNacimiento;
+	}
 
-    public void setFechaNacimiento(LocalDate fechaNacimiento) {
-        this.fechaNacimiento = fechaNacimiento;
-    }
+	public void setFechaNacimiento(LocalDate fechaNacimiento) {
+		this.fechaNacimiento = fechaNacimiento;
+	}
 
-    public String getFotoUrl() {
-        return fotoUrl;
-    }
+	public String getFotoUrl() {
+		return fotoUrl;
+	}
 
-    public void setFotoUrl(String fotoUrl) {
-        this.fotoUrl = fotoUrl;
-    }
+	public void setFotoUrl(String fotoUrl) {
+		this.fotoUrl = fotoUrl;
+	}
 
-    public Usuario getDueno() {
-        return dueno;
-    }
+	public Usuario getDueno() {
+		return dueno;
+	}
 
-    public void setDueno(Usuario dueno) {
-        this.dueno = dueno;
-    }
+	public void setDueno(Usuario dueno) {
+		this.dueno = dueno;
+	}
 
-    public Set<Cita> getCitas() {
-        return citas;
-    }
+	public Usuario getClinica() {
+		return clinica;
+	}
 
-    public void setCitas(Set<Cita> citas) {
-        this.citas = citas;
-    }
-    public Set<HistorialMedico> getHistorial() {
+	public void setClinica(Usuario clinica) {
+		this.clinica = clinica;
+	}
+
+	public Set<Cita> getCitas() {
+		return citas;
+	}
+
+	public void setCitas(Set<Cita> citas) {
+		this.citas = citas;
+	}
+
+	public Set<HistorialMedico> getHistorial() {
 		return historial;
 	}
 
@@ -145,26 +157,22 @@ public class Mascota {
 		this.alertas = alertas;
 	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        Mascota other = (Mascota) obj;
-        return Objects.equals(id, other.id);
-    }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		return Objects.equals(id, ((Mascota) obj).id);
+	}
 
-    @Override
-    public String toString() {
-        return "Mascota [id=" + id + ", nombre=" + nombre + ", especie=" + especie + "]";
-    }
-	
+	@Override
+	public String toString() {
+		return "Mascota [id=" + id + ", nombre=" + nombre + ", especie=" + especie + "]";
+	}
 }
