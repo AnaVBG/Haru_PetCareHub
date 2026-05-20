@@ -1,0 +1,30 @@
+# ── FASE 1: BUILD ──────────────────────────────────────────────
+# Usamos la imagen oficial de Maven con Java 21 para compilar
+FROM maven:3.9.6-eclipse-temurin-21 AS build
+
+# Directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# Copiamos primero solo el pom.xml para aprovechar la caché de Docker
+# Si el pom.xml no cambia, Docker reutiliza las dependencias descargadas
+COPY pom.xml .
+RUN mvn dependency:go-offline -B
+
+# Ahora copiamos el código fuente y compilamos
+COPY src ./src
+RUN mvn package -DskipTests -B
+
+# ── FASE 2: RUN ────────────────────────────────────────────────
+# Imagen mucho más ligera solo para ejecutar el JAR
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+# Copiamos el JAR generado en la fase anterior
+COPY --from=build /app/target/*.jar app.jar
+
+# Puerto que expone la app (Railway lo mapea automáticamente)
+EXPOSE 8080
+
+# Comando de arranque
+ENTRYPOINT ["java", "-jar", "app.jar"]
