@@ -10,7 +10,8 @@ public record MascotaInsertarDTO(
 	    String especie,
 	    String raza,
 	    LocalDate fechaNacimiento,
-	    Long duenoId
+	    Long duenoId,
+	    String fotoUrl
 		) {
 
 }

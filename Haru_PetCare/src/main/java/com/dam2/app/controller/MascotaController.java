@@ -40,8 +40,15 @@ public class MascotaController {
 		return ResponseEntity.status(201).body(mascotaService.guardarDesdeDTO(dto));
 	}
 
+	@PutMapping("/{id}/foto-url")
+	public ResponseEntity<MascotaDTO> actualizarFotoUrl(@PathVariable Long id,
+			@RequestBody String fotoUrl) {
+		return ResponseEntity.ok(mascotaService.actualizarFotoUrl(id, fotoUrl));
+	}
+
 	@PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<MascotaDTO> subirFoto(@PathVariable Long id, @RequestParam("foto") MultipartFile foto) {
+	public ResponseEntity<MascotaDTO> subirFoto(@PathVariable Long id,
+			@RequestParam("foto") MultipartFile foto) {
 		return ResponseEntity.ok(mascotaService.subirFoto(id, foto));
 	}
 

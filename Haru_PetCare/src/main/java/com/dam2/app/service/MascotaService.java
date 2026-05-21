@@ -55,10 +55,6 @@ public class MascotaService {
         return resultado.stream().map(this::toDTO).toList();
     }
 
-    /**
-     * Vincula una o todas las mascotas de un dueño a una clínica.
-     * Si dto.idMascota() es null se vinculan todas las mascotas del dueño.
-     */
     @Transactional
     public List<MascotaDTO> vincularAClinica(VincularMascotaClinicaDTO dto) {
         Usuario clinica = usuarioRepo.findById(dto.idClinica())
@@ -71,13 +67,11 @@ public class MascotaService {
         List<Mascota> mascotas;
 
         if (dto.idMascota() != null) {
-            // Vincular solo una mascota concreta
             Mascota m = mascotaRepo.findById(dto.idMascota())
                     .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
             m.setClinica(clinica);
             mascotas = List.of(mascotaRepo.save(m));
         } else {
-            // Vincular todas las mascotas del dueño
             mascotas = mascotaRepo.findByDueno_Id(dto.idDueno());
             if (mascotas.isEmpty()) {
                 throw new RuntimeException("El dueño no tiene mascotas registradas");
@@ -89,9 +83,6 @@ public class MascotaService {
         return mascotas.stream().map(this::toDTO).toList();
     }
 
-    /**
-     * Crea un dueño nuevo con una mascota y los vincula a la clínica.
-     */
     @Transactional
     public MascotaDTO crearDuenoConMascota(CrearDuenoConMascotaDTO dto) {
         if (usuarioRepo.findByEmail(dto.email()).isPresent()) {
@@ -101,7 +92,6 @@ public class MascotaService {
         Usuario clinica = usuarioRepo.findById(dto.idClinica())
                 .orElseThrow(() -> new RuntimeException("Clínica no encontrada"));
 
-        // Crear el dueño
         Usuario dueno = new Usuario();
         dueno.setNombre(dto.nombre());
         dueno.setEmail(dto.email());
@@ -111,7 +101,6 @@ public class MascotaService {
         dueno.setFechaRegistro(LocalDateTime.now());
         usuarioRepo.save(dueno);
 
-        // Crear la mascota vinculada al dueño y a la clínica
         Mascota mascota = new Mascota();
         mascota.setNombre(dto.nombreMascota());
         mascota.setEspecie(dto.especie());
@@ -134,8 +123,17 @@ public class MascotaService {
         nuevaMascota.setRaza(dto.raza());
         nuevaMascota.setFechaNacimiento(dto.fechaNacimiento());
         nuevaMascota.setDueno(dueno);
+        nuevaMascota.setFotoUrl(dto.fotoUrl());   // ← línea añadida
 
         return toDTO(mascotaRepo.save(nuevaMascota));
+    }
+
+    @Transactional
+    public MascotaDTO actualizarFotoUrl(Long id, String fotoUrl) {
+        Mascota mascota = mascotaRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada con id: " + id));
+        mascota.setFotoUrl(fotoUrl);
+        return toDTO(mascotaRepo.save(mascota));
     }
 
     @Transactional
