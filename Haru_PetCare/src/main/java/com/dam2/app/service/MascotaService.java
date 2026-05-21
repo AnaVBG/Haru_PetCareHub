@@ -132,7 +132,8 @@ public class MascotaService {
     public MascotaDTO actualizarFotoUrl(Long id, String fotoUrl) {
         Mascota mascota = mascotaRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Mascota no encontrada con id: " + id));
-        mascota.setFotoUrl(fotoUrl);
+        String cleanUrl = fotoUrl.replaceAll("^\"|\"$", "");
+        mascota.setFotoUrl(cleanUrl);
         return toDTO(mascotaRepo.save(mascota));
     }
 
