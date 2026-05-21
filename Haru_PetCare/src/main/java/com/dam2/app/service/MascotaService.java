@@ -178,4 +178,17 @@ public class MascotaService {
                 m.getClinica() != null ? m.getClinica().getId() : null
         );
     }
+    
+    @Transactional
+    public MascotaDTO actualizarMascota(Long id, MascotaActualizarDTO dto) {
+        Mascota mascota = mascotaRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Mascota no encontrada con id: " + id));
+        if (dto.nombre()          != null && !dto.nombre().isBlank())   mascota.setNombre(dto.nombre());
+        if (dto.especie()         != null && !dto.especie().isBlank())  mascota.setEspecie(dto.especie());
+        mascota.setRaza(dto.raza());
+        if (dto.fechaNacimiento() != null) mascota.setFechaNacimiento(dto.fechaNacimiento());
+        if (dto.fotoUrl()         != null && !dto.fotoUrl().isBlank())  mascota.setFotoUrl(dto.fotoUrl());
+        return toDTO(mascotaRepo.save(mascota));
+    }
+    
 }

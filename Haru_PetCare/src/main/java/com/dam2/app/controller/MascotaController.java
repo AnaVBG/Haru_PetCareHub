@@ -61,4 +61,10 @@ public class MascotaController {
 	public ResponseEntity<MascotaDTO> crearDuenoConMascota(@RequestBody CrearDuenoConMascotaDTO dto) {
 		return ResponseEntity.status(201).body(mascotaService.crearDuenoConMascota(dto));
 	}
+	
+	@PutMapping("/{id}")
+	public ResponseEntity<MascotaDTO> actualizarMascota(@PathVariable Long id,
+	        @RequestBody MascotaActualizarDTO dto) {
+	    return ResponseEntity.ok(mascotaService.actualizarMascota(id, dto));
+	}
 }
