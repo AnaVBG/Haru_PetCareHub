@@ -50,7 +50,7 @@ public class AuthService {
 
         String token = jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().name());
         return new LoginResponseDTO(usuario.getId(), usuario.getNombre(), usuario.getEmail(),
-                usuario.getRol().name(), token);
+                usuario.getRol().name(), usuario.getTelefono(), token);
     }
 
     @Transactional(readOnly = true)
@@ -64,7 +64,7 @@ public class AuthService {
 
         String token = jwtUtil.generarToken(usuario.getEmail(), usuario.getRol().name());
         return new LoginResponseDTO(usuario.getId(), usuario.getNombre(), usuario.getEmail(),
-                usuario.getRol().name(), token);
+                usuario.getRol().name(), usuario.getTelefono(), token);
     }
 
     @Transactional
