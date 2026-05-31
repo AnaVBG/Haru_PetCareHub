@@ -19,7 +19,7 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secretString.getBytes(StandardCharsets.UTF_8));
     }
 
-    private static final long EXPIRATION_MS = 1000 * 60 * 60 * 24; // 24 horas
+    private static final long EXPIRATION_MS = 1000 * 60 * 60 * 72; // 72 horas
 
     public String generarToken(String email, String rol) {
         return Jwts.builder()
