@@ -24,9 +24,8 @@ public class HistorialMedicoController {
         return ResponseEntity.ok(historialService.obtenerHistorialDeMascota(idMascota));
     }
 
-    /** Solo veterinarios pueden añadir registros médicos */
     @PostMapping
-    @PreAuthorize("hasRole('VETERINARIO')")
+    @PreAuthorize("hasRole('VETERINARIO') or hasRole('CLINICA')")
     public ResponseEntity<HistorialMedicoDTO> crearRegistro(
             @RequestBody HistorialInsertarDTO dto) {
         return ResponseEntity.ok(historialService.guardar(dto));
