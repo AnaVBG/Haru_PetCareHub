@@ -80,6 +80,7 @@ public class CitaService {
                 c.getFechaCita(),
                 c.getMotivo(),
                 c.getEstado().name(),
+                c.getMascota().getId(),
                 c.getMascota().getNombre(),
                 c.getVeterinario().getNombre(),
                 c.getDueno().getId()
