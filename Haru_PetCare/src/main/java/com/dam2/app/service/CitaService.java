@@ -2,6 +2,7 @@ package com.dam2.app.service;
 
 import com.dam2.app.dto.CitaDTO;
 import com.dam2.app.dto.CitaInsertarDTO;
+import com.dam2.app.dto.CitaActualizarDTO;
 import com.dam2.app.model.*;
 import com.dam2.app.repo.*;
 import org.springframework.stereotype.Service;
@@ -65,12 +66,14 @@ public class CitaService {
 
         return toDTO(citaRepo.save(cita));
     }
-
+    
     @Transactional
-    public CitaDTO cambiarEstado(Long idCita, String nuevoEstado) {
+    public CitaDTO actualizarCita(Long idCita, CitaActualizarDTO dto) {
         Cita cita = citaRepo.findById(idCita)
                 .orElseThrow(() -> new RuntimeException("Cita no encontrada"));
-        cita.setEstado(EstadoCita.valueOf(nuevoEstado));
+        if (dto.fechaCita() != null) cita.setFechaCita(dto.fechaCita());
+        if (dto.motivo()    != null) cita.setMotivo(dto.motivo());
+        if (dto.estado()    != null) cita.setEstado(EstadoCita.valueOf(dto.estado()));
         return toDTO(citaRepo.save(cita));
     }
 

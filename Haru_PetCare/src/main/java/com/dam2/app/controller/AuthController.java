@@ -38,4 +38,10 @@ public class AuthController {
         authService.actualizarTokenFcm(idUsuario, tokenFcm);
         return ResponseEntity.ok().build();
     }
+    
+    @PutMapping("/logout/{idUsuario}")
+    public ResponseEntity<Void> cerrarSesion(@PathVariable Long idUsuario) {
+        authService.cerrarSesion(idUsuario);
+        return ResponseEntity.ok().build();
+    }
 }

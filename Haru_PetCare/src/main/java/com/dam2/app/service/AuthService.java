@@ -73,4 +73,12 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         u.setTokenFcm(tokenFcm.replaceAll("^\"|\"$", ""));
     }
+    
+    @Transactional
+    public void cerrarSesion(Long idUsuario) {
+        Usuario u = usuarioRepo.findById(idUsuario)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        u.setTokenFcm(null);
+    }
+    
 }

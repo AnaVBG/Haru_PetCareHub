@@ -2,6 +2,7 @@ package com.dam2.app.controller;
 
 import com.dam2.app.dto.CitaDTO;
 import com.dam2.app.dto.CitaInsertarDTO;
+import com.dam2.app.dto.CitaActualizarDTO;
 import com.dam2.app.service.CitaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,11 +42,11 @@ public class CitaController {
     public ResponseEntity<CitaDTO> crearCita(@RequestBody CitaInsertarDTO dto) {
         return ResponseEntity.ok(citaService.crearCita(dto));
     }
-
-    @PutMapping("/{id}/estado")
+    
+    @PutMapping("/{id}")
     @PreAuthorize("hasRole('VETERINARIO') or hasRole('CLINICA')")
-    public ResponseEntity<CitaDTO> cambiarEstado(@PathVariable Long id,
-                                                  @RequestBody String nuevoEstado) {
-        return ResponseEntity.ok(citaService.cambiarEstado(id, nuevoEstado));
+    public ResponseEntity<CitaDTO> actualizarCita(@PathVariable Long id,
+                                                   @RequestBody CitaActualizarDTO dto) {
+        return ResponseEntity.ok(citaService.actualizarCita(id, dto));
     }
 }
