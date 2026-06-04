@@ -104,7 +104,7 @@ public class AlertaPerdidaService {
 		// 1. Obtener todos los usuarios con token FCM registrado
 		List<Usuario> candidatos = usuarioRepo.findByTokenFcmIsNotNull();
 
-		String titulo = "🐾 Mascota perdida cerca de ti";
+		String titulo = "Mascota perdida cerca de ti";
 		String mensaje = mascota.getNombre() + " (" + mascota.getEspecie() + ") se ha perdido. Contacta con "
 				+ dueno.getNombre() + " — " + dueno.getTelefono();
 
