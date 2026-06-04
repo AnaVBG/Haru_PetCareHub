@@ -71,6 +71,6 @@ public class AuthService {
     public void actualizarTokenFcm(Long idUsuario, String tokenFcm) {
         Usuario u = usuarioRepo.findById(idUsuario)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        u.setTokenFcm(tokenFcm);
+        u.setTokenFcm(tokenFcm.replaceAll("^\"|\"$", ""));
     }
 }
