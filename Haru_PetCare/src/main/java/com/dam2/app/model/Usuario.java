@@ -47,6 +47,12 @@ public class Usuario {
 	@Column(name = "token_fcm", length = 255)
 	private String tokenFcm;
 
+	@Column(name = "ultima_lat")
+	private Double ultimaLat;
+
+	@Column(name = "ultima_lng")
+	private Double ultimaLng;
+
 	@Column(name = "fecha_registro", nullable = false)
 	private LocalDateTime fechaRegistro;
 
@@ -192,6 +198,22 @@ public class Usuario {
 
 	public void setAlertas(Set<AlertaPerdida> alertas) {
 		this.alertas = alertas;
+	}
+
+	public Double getUltimaLat() {
+		return ultimaLat;
+	}
+
+	public void setUltimaLat(Double ultimaLat) {
+		this.ultimaLat = ultimaLat;
+	}
+
+	public Double getUltimaLng() {
+		return ultimaLng;
+	}
+
+	public void setUltimaLng(Double ultimaLng) {
+		this.ultimaLng = ultimaLng;
 	}
 
 	@Override

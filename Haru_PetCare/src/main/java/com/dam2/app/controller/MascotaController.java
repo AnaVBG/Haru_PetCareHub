@@ -41,14 +41,12 @@ public class MascotaController {
 	}
 
 	@PutMapping("/{id}/foto-url")
-	public ResponseEntity<MascotaDTO> actualizarFotoUrl(@PathVariable Long id,
-			@RequestBody String fotoUrl) {
+	public ResponseEntity<MascotaDTO> actualizarFotoUrl(@PathVariable Long id, @RequestBody String fotoUrl) {
 		return ResponseEntity.ok(mascotaService.actualizarFotoUrl(id, fotoUrl));
 	}
 
 	@PostMapping(value = "/{id}/foto", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<MascotaDTO> subirFoto(@PathVariable Long id,
-			@RequestParam("foto") MultipartFile foto) {
+	public ResponseEntity<MascotaDTO> subirFoto(@PathVariable Long id, @RequestParam("foto") MultipartFile foto) {
 		return ResponseEntity.ok(mascotaService.subirFoto(id, foto));
 	}
 
@@ -61,10 +59,15 @@ public class MascotaController {
 	public ResponseEntity<MascotaDTO> crearDuenoConMascota(@RequestBody CrearDuenoConMascotaDTO dto) {
 		return ResponseEntity.status(201).body(mascotaService.crearDuenoConMascota(dto));
 	}
-	
+
 	@PutMapping("/{id}")
-	public ResponseEntity<MascotaDTO> actualizarMascota(@PathVariable Long id,
-	        @RequestBody MascotaActualizarDTO dto) {
-	    return ResponseEntity.ok(mascotaService.actualizarMascota(id, dto));
+	public ResponseEntity<MascotaDTO> actualizarMascota(@PathVariable Long id, @RequestBody MascotaActualizarDTO dto) {
+		return ResponseEntity.ok(mascotaService.actualizarMascota(id, dto));
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> eliminarMascota(@PathVariable Long id) {
+		mascotaService.eliminarMascota(id);
+		return ResponseEntity.noContent().build();
 	}
 }

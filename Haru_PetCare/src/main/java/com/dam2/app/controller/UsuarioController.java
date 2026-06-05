@@ -1,11 +1,9 @@
 package com.dam2.app.controller;
 
 import com.dam2.app.dto.ClinicaDTO;
+import com.dam2.app.dto.UbicacionDTO;
 import com.dam2.app.dto.UsuarioDTO;
-import com.dam2.app.model.RolUsuario;
-import com.dam2.app.model.Usuario;
-import com.dam2.app.repo.MascotaRepository;
-import com.dam2.app.repo.UsuarioRepository;
+import com.dam2.app.service.UsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,43 +13,31 @@ import java.util.List;
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
 
-    private final UsuarioRepository usuarioRepo;
-    private final MascotaRepository mascotaRepo;
+    private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioRepository usuarioRepo,
-                             MascotaRepository mascotaRepo) {
-        this.usuarioRepo = usuarioRepo;
-        this.mascotaRepo = mascotaRepo;
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
     @GetMapping("/clinicas")
     public ResponseEntity<List<ClinicaDTO>> getClinicas() {
-        List<ClinicaDTO> clinicas = usuarioRepo.findByRol(RolUsuario.CLINICA)
-                .stream()
-                .map(u -> new ClinicaDTO(u.getId(), u.getNombre(), u.getTelefono()))
-                .toList();
-        return ResponseEntity.ok(clinicas);
+        return ResponseEntity.ok(usuarioService.obtenerClinicas());
     }
 
     @GetMapping("/buscar")
     public ResponseEntity<UsuarioDTO> buscarPorEmail(@RequestParam String email) {
-        Usuario usuario = usuarioRepo.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-        int totalMascotas = mascotaRepo.findByDueno_Id(usuario.getId()).size();
-        return ResponseEntity.ok(new UsuarioDTO(
-                usuario.getId(), usuario.getNombre(), usuario.getEmail(),
-                usuario.getRol().name(), usuario.getTelefono(), totalMascotas));
+        return ResponseEntity.ok(usuarioService.buscarPorEmail(email));
     }
 
     @GetMapping("/veterinarios-clinica/{idClinica}")
-    public ResponseEntity<List<UsuarioDTO>> getVeterinariosDeClinica(
-            @PathVariable Long idClinica) {
-        List<UsuarioDTO> vets = usuarioRepo.findByClinica_Id(idClinica)
-                .stream()
-                .map(u -> new UsuarioDTO(
-                        u.getId(), u.getNombre(), u.getEmail(),
-                        u.getRol().name(), u.getTelefono(), null))
-                .toList();
-        return ResponseEntity.ok(vets);
+    public ResponseEntity<List<UsuarioDTO>> getVeterinariosDeClinica(@PathVariable Long idClinica) {
+        return ResponseEntity.ok(usuarioService.obtenerVeterinariosDeClinica(idClinica));
+    }
+
+    @PutMapping("/{id}/ubicacion")
+    public ResponseEntity<Void> actualizarUbicacion(@PathVariable Long id,
+                                                     @RequestBody UbicacionDTO dto) {
+        usuarioService.actualizarUbicacion(id, dto.lat(), dto.lng());
+        return ResponseEntity.ok().build();
     }
 }

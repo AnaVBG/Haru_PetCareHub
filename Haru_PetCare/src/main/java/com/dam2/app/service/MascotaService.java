@@ -191,4 +191,12 @@ public class MascotaService {
         return toDTO(mascotaRepo.save(mascota));
     }
     
+    @Transactional
+    public void eliminarMascota(Long id) {
+        if (!mascotaRepo.existsById(id)) {
+            throw new RuntimeException("Mascota no encontrada con id: " + id);
+        }
+        mascotaRepo.deleteById(id);
+    }
+    
 }
